@@ -1,4 +1,6 @@
-/* Dreaming Ages wind-down check. Plain JS, no cookies, no storage, no network calls. Email/copy my results uses mailto + clipboard only. */
+/* Dreaming Ages wind-down check. Plain JS, no cookies, no storage. DA_GATE (18 Oct 2026): results are built and shown only after the visitor
+   signs up with their email (Kit form 10038283, same form as /sleep/). The ONLY network call is that email POST to Kit; quiz answers are never sent.
+   Email/copy my results uses mailto + clipboard only. Local preview only (localhost/127.0.0.1): ?mock=ok|fail fakes the Kit reply, nothing is sent. */
 (function(){
   var KIT = 'https://kit-dreaming-ages.kit.com/d09dc2b5c3', OF={"r": "Give your racing mind somewhere calm to go", "s": "A steady Monday note for a steadier week", "l": "Quiet stories for light sleepers, once a week", "g": "Keep your good nights coming"};
   var R = window.DA_REF||{}, SB='../sleep-guide/', GB='../sleep-guide/', ST={"r": [6, 8, 10], "s": [1, 2, 5], "l": [7, 3, 10], "g": [1, 2, 5]}; function sup(keys){return (keys||[]).map(function(k){return R[k]?'<sup><a href="'+SB+'#src-'+R[k]+'">'+R[k]+'</a></sup>':'';}).join('');}
@@ -74,6 +76,9 @@
     l:'<circle cx="75" cy="75" r="62" fill="#141d47" stroke="#e3c77d" stroke-opacity=".5"/><path d="M60 100c-2-24 12-48 40-62-8 20-10 42-30 58" fill="none" stroke="#f1dc9c" stroke-width="2.5" stroke-linejoin="round"/><path d="M60 100l40-62M66 86l10 2M72 74l12 0M80 62l11-2" stroke="#e3c77d" stroke-width="1.6" stroke-linecap="round"/><path d="M40 52a14 14 0 1 0 9 24 11 11 0 0 1-9-24z" fill="#f1dc9c"/><g fill="#fff6d8"><circle cx="110" cy="100" r="1.8"/><circle cx="100" cy="116" r="1.3"/></g>',
     g:'<circle cx="75" cy="75" r="62" fill="#141d47" stroke="#e3c77d" stroke-opacity=".5"/><circle cx="75" cy="64" r="26" fill="#f1dc9c"/><circle cx="66" cy="58" r="4" fill="#e3c77d" opacity=".5"/><circle cx="83" cy="72" r="3" fill="#e3c77d" opacity=".45"/><path d="M28 106c14-10 26-10 40 0s26 10 40 0 14-6 14-6" fill="none" stroke="#c6cbe2" stroke-width="2.4" stroke-linecap="round" opacity=".7"/><path d="M36 118c12-8 22-8 34 0s22 8 34 0" fill="none" stroke="#c6cbe2" stroke-width="2" stroke-linecap="round" opacity=".45"/>'
   };
+  var FORM='https://app.kit.com/forms/10038283/subscriptions', SRC_FIELD=''; // SRC_FIELD: set to a Kit custom-field key (e.g. 'signup_source') once it exists in Kit, to record 'sleep-quiz'
+  var LOCAL=/^(localhost|127\.0\.0\.1)$/.test(location.hostname), MOCK=LOCAL?((location.search.match(/[?&]mock=(ok|fail)/)||[])[1]||''):'';
+  var unlocked=false, sending=false;
   var root=document.getElementById('quiz'); if(!root) return;
   var ans=[], i=-1, bar=null, io=null, closed=false, cur=null;
   function stickyOff(){ if(bar) bar.classList.remove('on'); if(io){io.disconnect();io=null;} }
@@ -123,7 +128,7 @@
     if(sc && !matchMedia('(prefers-reduced-motion: reduce)').matches){sc.classList.add('out'); setTimeout(go,300);} else go();
   }
   function intro(){ i=-1; stickyOff();
-    swap('<div class="intro"><div class="q-kicker">Your wind-down check</div><h2>Find your sleep style</h2><p>Eight quick taps, no typing, under two minutes. You\u2019ll get a calm little plan and a story to try tonight.</p><div class="chips"><span class="chip">\u23F1 2 minutes</span><span class="chip">\uD83D\uDD12 Nothing is saved</span><span class="chip">\uD83C\uDF19 Just for you</span></div><button class="btn" type="button" data-start>Begin \u2192</button></div>','h2');
+    swap('<div class="intro"><div class="q-kicker">Your wind-down check</div><h2>Find your sleep style</h2><p>Eight quick taps, under two minutes. Then enter your email to see your sleep style, a calm little plan and a story to try tonight.</p><div class="chips"><span class="chip">\u23F1 2 minutes</span><span class="chip">\uD83D\uDD12 Answers stay on this page</span><span class="chip">\uD83C\uDF19 Just for you</span></div><button class="btn" type="button" data-start>Begin \u2192</button></div>','h2');
   }
   function ask(){ stickyOff();
     var q=Q[i], h='<div class="q-kicker">'+esc(q.k)+'</div><div class="q-title" role="heading" aria-level="2">'+esc(q.t)+'</div><div class="opts" role="list">';
@@ -135,6 +140,7 @@
     ans.forEach(function(a,n){var w=Q[n].o[a][2]; for(var k in w) t[k]+=w[k];});
     var best='g', max=0; ['r','l','s'].forEach(function(k){ if(t[k]>max){max=t[k];best=k;} });
     if(max<3) best='g';
+    if(!unlocked){ gate(); return; }
     var p=P[best], score=Math.round(t.h/(Q.length*3)*100);
     var band = score>=80?'Mostly in tune':score>=55?'A few loose threads':'Plenty of room to soften';
     var h='<div class="res"><svg class="badge" viewBox="0 0 150 150" role="img" aria-label="'+esc(p.name)+' badge">'+BADGE[best]+'</svg>'+
@@ -145,20 +151,49 @@
     h+='</ol>';
     var mt=mailto(best,t.flag); cur={best:best,flag:t.flag};
     h+='<div class="keep"><div class="keep-row"><a class="btn ghost sm" href="'+esc(mt.url)+'" data-mail>\u2709\uFE0F Email my results to myself</a><button class="btn ghost sm" type="button" data-copy>\uD83D\uDCCB Copy my results</button></div><p class="keep-note" role="status" aria-live="polite">Opens your own email app, with the To line left blank. Nothing is sent to us.</p></div>';
-    h+='<div class="offer" id="offer"><div class="ok">Free bedtime companion</div><h3>'+esc(OF[best])+'</h3><p>Join the Dreaming Ages list for slow, calm history to fall asleep to.</p><ul><li><b>A free Bedtime Companion PDF</b> for every episode, with maps, timelines, and the people and places behind each story</li><li><b>One quiet email on Mondays</b> with that week\u2019s new sleep stories</li><li><b>A small history curiosity</b> to read by lamplight</li></ul><a class="btn" href="'+KIT+'" target="_blank" rel="noopener">Send me the free companion \u2192</a><p class="fine">Every episode, companion and email is free, with no paywall or paid plan. One quiet email a week. Unsubscribe with one click. Your quiz answers aren\u2019t sent with your email.</p></div>';
+    h+='<div class="offer joined" id="offer"><div class="ok">\u2714 You\u2019re on the list</div><h3>'+esc(OF[best])+'</h3><p>Your free Bedtime Companion library is on its way. Look for an email from hello@dreamingages.com in a minute or two (it may land in Promotions).</p><p class="fine">Every episode, companion and email is free, with no paywall or paid plan. Unsubscribe anytime with one click.</p></div>';
     h+='<div class="sub-h">Stories for tonight</div><div class="eps">';
     p.eps.forEach(function(e){h+='<a class="ep" href="'+YT(e[0])+'" target="_blank" rel="noopener"><span class="play"><svg viewBox="0 0 16 16"><path d="M3 1.5v13l11-6.5z"/></svg></span><span><b>'+esc(e[1])+'</b><small>'+esc(e[2])+'</small></span></a>';});
     h+='</div>';
     if(t.flag) h+='<p class="care">Feeling very sleepy in the day, even after a full night, is worth mentioning to a doctor, especially if someone has noticed loud snoring or pauses in your breathing.'+sup(['nhsosa'])+'</p>';
     h+='<div class="actions"><button class="btn ghost" type="button" data-again>Take it again</button></div>'+
       '<p class="fine">This is a friendly self-check, not a medical test, and it isn\u2019t medical advice. Your answers stay on this page and aren\u2019t saved or sent anywhere, unless you choose to email or copy them yourself. If poor sleep has lasted more than about three months, or is affecting your days, please talk to a doctor.'+sup(['nhsins'])+' Loud snoring, gasping or choking at night can be a sign of sleep apnoea, so it\u2019s worth getting checked.'+sup(['nhsosa'])+' <a href="../sleep-guide/#help">More help</a>.</p></div>';
-    i=Q.length; swap(h,'h2'); setTimeout(stickyOn,900);
+    i=Q.length; swap(h,'h2');
   }
+  function gate(){ stickyOff(); i=Q.length; sending=false;
+    swap('<div class="gate"><div class="q-kicker">Your results are ready</div><h2>See your sleep style</h2>'+
+      '<p>Enter your email to see your sleep style, three calm things to try and a story for tonight. We\u2019ll also send you the free Bedtime Companion library.</p>'+
+      '<form class="gate-form" novalidate><label class="sr" for="gate-email">Email address</label><input id="gate-email" type="email" name="email_address" placeholder="Your email" required autocomplete="email" inputmode="email" autocapitalize="off" spellcheck="false"><button class="btn" type="submit">Show my results \u2192</button></form>'+
+      '<p class="gate-msg" role="alert"></p>'+
+      '<p class="fine">You\u2019ll get the link to the free Bedtime Companion library and an occasional bedtime email from Dreaming Ages, usually when a new episode is ready. Unsubscribe anytime with one click. We never share or sell your email. Your quiz answers stay on this page and aren\u2019t sent with your email. <a href="../privacy/">Privacy</a> \u00b7 Questions? <a href="mailto:hello@dreamingages.com">hello@dreamingages.com</a></p>'+
+      '<button class="linkish" type="button" data-backq>\u2039 Change my answers</button></div>','h2');
+  }
+  function kitSend(email){
+    if(MOCK) return new Promise(function(ok,no){ setTimeout(function(){ MOCK==='ok'?ok({status:'success'}):no({kit:1}); },600); });
+    if(!window.fetch) return Promise.reject({net:1});
+    var fd=new FormData(); fd.append('email_address',email); if(SRC_FIELD) fd.append('fields['+SRC_FIELD+']','sleep-quiz');
+    var ctl=window.AbortController?new AbortController():null, to=setTimeout(function(){ if(ctl) ctl.abort(); },15000);
+    return fetch(FORM,{method:'POST',body:fd,headers:{'Accept':'application/json'},signal:ctl?ctl.signal:undefined}).then(function(r){
+      clearTimeout(to);
+      return r.json().catch(function(){return {};}).then(function(j){ if(!r.ok || j.status==='failed') throw {kit:1}; return j; });
+    },function(){ clearTimeout(to); throw {net:1}; });
+  }
+  root.addEventListener('submit',function(e){
+    var f=e.target.closest('.gate-form'); if(!f) return; e.preventDefault(); if(sending) return;
+    var inp=f.querySelector('input[type=email]'), btn=f.querySelector('button'), msg=root.querySelector('.gate-msg'), v=(inp.value||'').trim();
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)){ msg.textContent='Please enter a full email address, like name@example.com.'; inp.setAttribute('aria-invalid','true'); inp.focus(); return; }
+    inp.removeAttribute('aria-invalid'); sending=true; btn.disabled=true; btn.textContent='One moment\u2026'; msg.textContent='';
+    kitSend(v).then(function(){ unlocked=true; result(); },function(err){
+      sending=false; btn.disabled=false; btn.textContent='Show my results \u2192';
+      msg.textContent = err&&err.kit ? 'That didn\u2019t go through. Please check your email address and try again.' : 'We couldn\u2019t reach our email service just now. Please check your connection and try again. If it keeps happening, write to hello@dreamingages.com.';
+    });
+  });
   root.addEventListener('click',function(e){
     var m=e.target.closest('[data-mail]'); if(m && cur){ m.href=mailto(cur.best,cur.flag).url; var n0=root.querySelector('.keep-note'); if(n0) n0.textContent='Opening your email app\u2026 If nothing happens, use \u201cCopy my results\u201d and paste them into an email or note.'; return; }
     var b=e.target.closest('button'); if(!b) return;
     if(b.hasAttribute('data-copy') && cur){ var note=root.querySelector('.keep-note'), txt='My Dreaming Ages sleep check results\n\n'+mailText(cur.best,cur.flag,0);
       copyText(txt,function(ok){ b.textContent=ok?'\u2714\uFE0F Copied':'\uD83D\uDCCB Copy my results'; if(note) note.textContent=ok?'Copied. Paste it into an email, a note or a message to yourself.':'Couldn\u2019t copy here. Try the email button instead.'; setTimeout(function(){b.textContent='\uD83D\uDCCB Copy my results';},2500); }); return; }
+    if(b.hasAttribute('data-backq')){i=Q.length-1;ask();return;}
     if(b.hasAttribute('data-start')){i=0;ans=[];ask();}
     else if(b.hasAttribute('data-again')){intro();}
     else if(b.hasAttribute('data-back')){ if(i>0){i--;ask();} }
@@ -168,7 +203,7 @@
     }
   });
   intro();
-  // test hook for screenshots only: ?demo=r|s|l|g&q=N
+  // test hook for screenshots only: ?demo=r|s|l|g&q=N (demo goes to the email gate like everyone else; results still need a submit)
   var m=location.search.match(/demo=([rslg])/), qm=location.search.match(/[?&]q=(\d)/);
   if(qm){i=+qm[1];ans=[];ask();}
   if(m){var pick={r:[3,3,0,0,0,3,0,1],s:[1,0,0,0,3,2,0,2],l:[1,0,3,1,0,0,3,1],g:[0,0,0,0,0,0,0,1]}[m[1]]; ans=pick; result();}
