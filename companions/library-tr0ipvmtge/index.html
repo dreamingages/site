@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" type="image/png" sizes="32x32" href="/img/icon_dusk_32.png"><link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="robots" content="noindex,nofollow">
+<title>Dreaming Ages · Your Bedtime Companion library</title>
+<meta name="description" content="Your Bedtime Companion library: free printable bedtime companions for every Dreaming Ages episode, with maps, timelines, and the people and places behind each story.">
+<style>
+html,body{margin:0;height:100%}
+body{font-family:Georgia,'Times New Roman',serif;color:#e8e4d8;background:radial-gradient(ellipse at 50% 120%,#1f2a4a 0%,#0d1326 45%,#05070f 100%);min-height:100vh;overflow-x:hidden}
+#sky{position:fixed;inset:0;z-index:0}
+.moon{position:fixed;top:9vh;right:12vw;width:90px;height:90px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fffbe8,#e9dfb8 60%,#c9bd92);box-shadow:0 0 60px 18px rgba(255,246,210,.18);z-index:1}
+main{position:relative;z-index:2;max-width:560px;margin:0 auto;padding:16vh 24px 60px;text-align:center}
+.brand{letter-spacing:.3em;font-size:.8rem;text-transform:uppercase;color:#a9b3d6}
+h1{font-weight:normal;font-size:2.3rem;line-height:1.25;margin:.6em 0 .3em}
+.sub{font-size:1.15rem;color:#c9cbe0}
+p{line-height:1.7;color:#cfd2e6}
+.card{margin:2em auto;padding:28px 24px;border-radius:14px;background:rgba(15,20,40,.6);border:1px solid rgba(169,179,214,.18);backdrop-filter:blur(4px)}
+
+.kit-placeholder input{width:100%;box-sizing:border-box;padding:14px;border-radius:8px;border:1px solid #3a4470;background:#0b1022;color:#e8e4d8;font:inherit;margin-bottom:12px}
+.kit-placeholder button{width:100%;padding:14px;border:0;border-radius:8px;background:#d9c98f;color:#141a30;font:inherit;font-size:1.05rem;cursor:pointer}
+.small{font-size:.85rem;color:#8e95b8}
+ul{list-style:none;padding:0;color:#c9cbe0;line-height:2}
+footer{font-size:.85rem;color:#a3aacb;margin-top:3em}
+footer a{color:#f0e3b4}
+.eps a{color:#e8e4d8;text-decoration:none;border-bottom:1px solid rgba(217,201,143,.5)}
+.eps a:hover{color:#d9c98f}
+a{color:#f0e3b4;text-decoration:underline;text-underline-offset:3px}
+.eps a{text-decoration:none}
+.lead{font-size:1.05rem;color:#d6d8ea}
+@media (prefers-reduced-motion:reduce){#sky{display:none}}
+</style></head>
+<body>
+<canvas id="sky"></canvas><div class="moon" aria-hidden="true"></div>
+<main>
+<div class="brand">Dreaming Ages</div>
+<h1>Your Bedtime Companion library</h1>
+<div class="sub">Your Bedtime Companion library: free printable bedtime companions for every episode, with maps, timelines, and the people and places behind each story. New companions are added as each episode airs.</div>
+<div class="card">
+<ul class="eps">
+<!-- LIBRARY:START -->
+<li><a href="/companions/samhain.pdf">Samhain</a> <span class="small">· Episode 06 · PDF</span></li>
+<li><a href="/companions/vikings.pdf">The Vikings</a> <span class="small">· Episode 05 · PDF</span></li>
+<li><a href="/companions/ancient-greece.pdf">Ancient Greece</a> <span class="small">· Episode 04 · PDF</span></li>
+<li><a href="/companions/feudal-japan.pdf">Feudal Japan</a> <span class="small">· Episode 03 · PDF</span></li>
+<li><a href="/companions/egypt.pdf">Ancient Egypt</a> <span class="small">· Episode 02 · PDF</span></li>
+<li><a href="/companions/silk-road.pdf">The Silk Road</a> <span class="small">· Episode 01 · PDF</span></li>
+<!-- LIBRARY:END -->
+</ul>
+</div>
+<p>Keep one by the lamp, or skim it once and let the episode do the rest.</p>
+<p class="small">This is your subscriber library, so bookmark it. A new free companion arrives with every week's episodes.<br><a href="https://dreamingages.com/reading/">Episode reading lists</a></p>
+<p class="small">Every episode, companion and email is free, with no paywall or paid plan.</p>
+<footer><a href="https://www.youtube.com/@DreamingAgesHistory">Listen on YouTube</a> · <a href="https://buymeacoffee.com/dreamingages">Buy me a coffee</a></footer>
+</main>
+<script>
+const c=document.getElementById('sky'),x=c.getContext('2d');let s=[];
+function init(){c.width=innerWidth;c.height=innerHeight;s=[];for(let i=0;i<Math.floor(c.width*c.height/3500);i++)s.push({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*1.3+.2,p:Math.random()*6.28,v:.003+Math.random()*.008})}
+function draw(){x.clearRect(0,0,c.width,c.height);for(const t of s){t.p+=t.v;x.globalAlpha=.35+.65*Math.abs(Math.sin(t.p));x.fillStyle='#fff';x.beginPath();x.arc(t.x,t.y,t.r,0,6.28);x.fill()}requestAnimationFrame(draw)}
+addEventListener('resize',init);init();draw();
+</script>
+</body></html>

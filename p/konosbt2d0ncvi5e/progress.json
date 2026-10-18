@@ -1,0 +1,31 @@
+{
+ "channel": "Dreaming Ages History",
+ "goal_deadline": "2027-01-31",
+ "updated_et": "2026-10-16 09:39",
+ "data_through": "2026-10-13",
+ "subscribers": 14,
+ "subscribers_target": 1000,
+ "subscribers_pct": 1.4,
+ "watch_hours_public_longform_365d": 25.8,
+ "watch_hours_target": 4000,
+ "watch_hours_pct": 0.65,
+ "watch_hours_28d_all": 43.6,
+ "watch_hours_28d_longform": 31.4,
+ "subscribers_7d_net": 9,
+ "watch_hours_7d_public_longform": 23.6,
+ "subs_per_day_needed": null,
+ "subs_per_day_actual": null,
+ "subs_on_track": null,
+ "subs_projected_date": null,
+ "hours_per_day_needed": null,
+ "hours_per_day_actual": null,
+ "hours_on_track": null,
+ "hours_projected_date": null,
+ "latest_episode": {
+  "title": "The Ancient Origins of Halloween: Samhain | History for Sleep",
+  "published": "2026-10-15",
+  "views": 52,
+  "watch_hours": 0.0
+ },
+ "note": "Estimate from YouTube Analytics (lags ~2 days). YouTube Studio's Earn page is the official count."
+}
