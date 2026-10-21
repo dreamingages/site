@@ -3,6 +3,11 @@ on:
   schedule:
     - cron: "17 * * * *"   # hourly
   workflow_dispatch:
+  push:
+    branches: [gh-pages]
+    paths:
+      - ".github/workflows/latest-episode.yml"
+      - ".github/scripts/update_latest.py"
 permissions:
   contents: write
 concurrency:
