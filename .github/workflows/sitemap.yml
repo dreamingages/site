@@ -30,6 +30,8 @@ jobs:
           python3 .github/scripts/build_sitemap.py
           python3 -c "import xml.etree.ElementTree as E;E.parse('sitemap.xml');print('sitemap.xml is valid XML')"
           if git diff --quiet -- sitemap.xml; then echo "changed=false" >> "$GITHUB_OUTPUT"; else echo "changed=true" >> "$GITHUB_OUTPUT"; fi
+          # also submit (without a sitemap change) when this push edits the submit script or this workflow
+          if [ "${{ github.event_name }}" = "push" ] && git diff --name-only "${{ github.event.before }}" "${{ github.sha }}" 2>/dev/null | grep -qE '^\.github/(scripts/submit_sitemap\.py|workflows/sitemap\.yml)$'; then echo "force=true" >> "$GITHUB_OUTPUT"; else echo "force=false" >> "$GITHUB_OUTPUT"; fi
       - name: Commit if changed
         if: steps.build.outputs.changed == 'true'
         run: |
@@ -39,7 +41,7 @@ jobs:
           git commit -m "Sitemap: rebuilt from pages [sitemap-bot]"
           for i in 1 2 3; do git pull --rebase -q && git push && exit 0; sleep 10; done; exit 1
       - name: Submit to Search Console
-        if: steps.build.outputs.changed == 'true'
+        if: steps.build.outputs.changed == 'true' || steps.build.outputs.force == 'true'
         env:
           GSC_SA_KEY: ${{ secrets.GSC_SA_KEY }}
         run: |
