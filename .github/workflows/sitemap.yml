@@ -1,0 +1,47 @@
+name: Sitemap - rebuild and submit
+on:
+  push:
+    branches: [gh-pages]
+  workflow_run:
+    workflows: ["Home page - newest episode"]
+    types: [completed]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: sitemap
+  cancel-in-progress: false
+jobs:
+  sitemap:
+    # loop guard: never react to our own sitemap commit (GITHUB_TOKEN pushes don't retrigger workflows anyway)
+    if: >-
+      !contains(github.event.head_commit.message, '[sitemap-bot]') &&
+      (github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          fetch-depth: 0
+      - name: Rebuild sitemap.xml from the pages
+        id: build
+        run: |
+          python3 .github/scripts/build_sitemap.py
+          python3 -c "import xml.etree.ElementTree as E;E.parse('sitemap.xml');print('sitemap.xml is valid XML')"
+          if git diff --quiet -- sitemap.xml; then echo "changed=false" >> "$GITHUB_OUTPUT"; else echo "changed=true" >> "$GITHUB_OUTPUT"; fi
+      - name: Commit if changed
+        if: steps.build.outputs.changed == 'true'
+        run: |
+          git config user.name "dreamingages-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add sitemap.xml
+          git commit -m "Sitemap: rebuilt from pages [sitemap-bot]"
+          for i in 1 2 3; do git pull --rebase -q && git push && exit 0; sleep 10; done; exit 1
+      - name: Submit to Search Console
+        if: steps.build.outputs.changed == 'true'
+        env:
+          GSC_SA_KEY: ${{ secrets.GSC_SA_KEY }}
+        run: |
+          pip install --quiet google-auth requests
+          python3 .github/scripts/submit_sitemap.py
