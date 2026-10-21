@@ -1,0 +1,30 @@
+name: Home page - newest episode
+on:
+  schedule:
+    - cron: "17 * * * *"   # hourly
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: latest-episode
+  cancel-in-progress: false
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install --quiet pillow
+      - name: Update home page block
+        run: python3 .github/scripts/update_latest.py
+      - name: Commit only if changed
+        run: |
+          if [ -z "$(git status --porcelain index.html latest.json img/yt)" ]; then echo "No change"; exit 0; fi
+          git config user.name "dreamingages-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html latest.json img/yt
+          git commit -m "Home: newest episode $(python3 -c 'import json;print(json.load(open("latest.json"))["id"])')"
+          for i in 1 2 3; do git pull --rebase -q && git push && exit 0; sleep 10; done; exit 1

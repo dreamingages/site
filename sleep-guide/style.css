@@ -16,7 +16,7 @@ h1,h2,h3,.cinzel{font-family:Cinzel,Georgia,serif;font-weight:600;letter-spacing
 header.hero{text-align:center;padding:64px 0 24px}
 header.hero h1{font-size:clamp(2rem,7vw,3.1rem);line-height:1.15;margin:.35em 0 .2em}
 header.hero p{color:var(--soft);font-size:1.08rem;max-width:560px;margin:0 auto}
-.moon{width:92px;height:92px;margin:0 auto 6px;border-radius:50%;background:radial-gradient(circle at 36% 34%,#fffaf0 0%,#f3e3b0 48%,#d8bb6c 100%);box-shadow:0 0 50px 14px rgba(243,227,176,.22),0 0 120px 40px rgba(243,227,176,.08)}
+.moon{width:58px;height:58px;margin:0 auto 10px;border-radius:50%;background:transparent;box-shadow:inset -11px 7px 0 0 #f3e3b0;filter:drop-shadow(0 0 8px rgba(243,227,176,.35));transform:rotate(-12deg)}
 .jump{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:22px 0 0}
 .btn{display:inline-block;border:0;cursor:pointer;font:700 1rem Lato,Arial,sans-serif;padding:14px 22px;border-radius:999px;background:linear-gradient(180deg,#f0d993,#d4b25c);color:#151b38;text-decoration:none;box-shadow:0 6px 20px rgba(227,199,125,.25);transition:transform .2s,box-shadow .2s}
 .btn:hover{transform:translateY(-1px);box-shadow:0 8px 26px rgba(227,199,125,.35)}
