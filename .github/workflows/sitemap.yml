@@ -1,4 +1,10 @@
 name: Sitemap - rebuild and submit
+# Dreaming Ages site (GitHub Pages, branch gh-pages). Runs entirely on GitHub: no box, mini PC or assistant needed.
+# Job 1 "sitemap": rebuild sitemap.xml from every indexable page (.github/scripts/build_sitemap.py) and commit it if it changed.
+# Job 2 "after-deploy" (only when the site really changed): wait for the Pages build + live sitemap, ping IndexNow
+#   (Bing/Yandex) with the changed URLs, then Search Console sitemaps.submit (.github/scripts/after_deploy.py).
+#   A failed submit turns only this job red (visible in Actions + GitHub's failed-run email); the Pages deploy is a
+#   separate workflow and is never blocked. The weekly ops check (dreamingages/ops search-index.yml) also alerts the phone.
 on:
   push:
     branches: [gh-pages]
@@ -6,8 +12,11 @@ on:
     workflows: ["Home page - newest episode"]
     types: [completed]
   workflow_dispatch:
+    inputs:
+      before: { description: "Optional: compare against this commit for IndexNow (default HEAD~1)", required: false, default: "" }
 permissions:
   contents: write
+  pages: read
 concurrency:
   group: sitemap
   cancel-in-progress: false
@@ -18,7 +27,11 @@ jobs:
       !contains(github.event.head_commit.message, '[sitemap-bot]') &&
       (github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success')
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
+    outputs:
+      changed: ${{ steps.build.outputs.changed }}
+      site_changed: ${{ steps.build.outputs.site_changed }}
+      before: ${{ steps.build.outputs.before }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -26,12 +39,25 @@ jobs:
           fetch-depth: 0
       - name: Rebuild sitemap.xml from the pages
         id: build
+        env:
+          EV: ${{ github.event_name }}
+          PUSH_BEFORE: ${{ github.event.before }}
+          WR_SHA: ${{ github.event.workflow_run.head_sha }}
+          IN_BEFORE: ${{ inputs.before }}
         run: |
           python3 .github/scripts/build_sitemap.py
           python3 -c "import xml.etree.ElementTree as E;E.parse('sitemap.xml');print('sitemap.xml is valid XML')"
           if git diff --quiet -- sitemap.xml; then echo "changed=false" >> "$GITHUB_OUTPUT"; else echo "changed=true" >> "$GITHUB_OUTPUT"; fi
-          # also submit (without a sitemap change) when this push edits the submit script or this workflow
-          if [ "${{ github.event_name }}" = "push" ] && git diff --name-only "${{ github.event.before }}" "${{ github.sha }}" 2>/dev/null | grep -qE '^\.github/(scripts/submit_sitemap\.py|workflows/sitemap\.yml)$'; then echo "force=true" >> "$GITHUB_OUTPUT"; else echo "force=false" >> "$GITHUB_OUTPUT"; fi
+          case "$EV" in
+            push) B="$PUSH_BEFORE" ;;
+            workflow_run) B="$WR_SHA" ;;
+            *) B="${IN_BEFORE:-$(git rev-parse HEAD~1)}" ;;
+          esac
+          if ! git cat-file -e "${B}^{commit}" 2>/dev/null; then B="$(git rev-parse HEAD~1)"; fi
+          echo "before=$B" >> "$GITHUB_OUTPUT"
+          # "site changed" = any published file changed (not just workflow files); dispatch always counts
+          if [ "$EV" = "workflow_dispatch" ] || git diff --name-only "$B" HEAD | grep -qv '^\.github/'; then echo "site_changed=true" >> "$GITHUB_OUTPUT"; else echo "site_changed=false" >> "$GITHUB_OUTPUT"; fi
+          if git diff --name-only "$B" HEAD | grep -qE '^\.github/(scripts/(after_deploy|build_sitemap)\.py|workflows/sitemap\.yml)$'; then echo "site_changed=true" >> "$GITHUB_OUTPUT"; fi
       - name: Commit if changed
         if: steps.build.outputs.changed == 'true'
         run: |
@@ -40,10 +66,21 @@ jobs:
           git add sitemap.xml
           git commit -m "Sitemap: rebuilt from pages [sitemap-bot]"
           for i in 1 2 3; do git pull --rebase -q && git push && exit 0; sleep 10; done; exit 1
-      - name: Submit to Search Console
-        if: steps.build.outputs.changed == 'true' || steps.build.outputs.force == 'true'
+  after-deploy:
+    needs: sitemap
+    if: needs.sitemap.outputs.changed == 'true' || needs.sitemap.outputs.site_changed == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          fetch-depth: 0
+      - name: Wait for Pages, IndexNow ping, Search Console submit
         env:
+          BEFORE: ${{ needs.sitemap.outputs.before }}
+          GITHUB_TOKEN: ${{ github.token }}
           GSC_SA_KEY: ${{ secrets.GSC_SA_KEY }}
         run: |
           pip install --quiet google-auth requests
-          python3 .github/scripts/submit_sitemap.py
+          python3 .github/scripts/after_deploy.py
