@@ -146,3 +146,68 @@ html{font-size:112.5%;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 
 /* 17. Long unbroken text (source URLs on the episode pages) wraps instead of pushing the page wider than a phone screen (all-hallows was 409px wide at 400px) */
 :root:root body :is(main,article) :is(p,li,dd,figcaption,a){overflow-wrap:break-word}
+
+/* 18. Day / Night switch (preview 26 Oct 2026). Night is the default look and is not touched by anything below.
+   Day (<html data-theme="day">, set by the inline script in <head> from localStorage) is a calm cream page with deep-navy text and dark-gold
+   accents, no stars; the moon becomes a faint sun. Every rule is under :root:root[data-theme="day"] so Night pages are unchanged and
+   pages with no JS stay Night. Contrast is checked by scripts/release/test_da_readable.py (palette) and a browser audit over every page. */
+.da-theme{display:inline-flex;align-items:center;gap:.45rem;box-sizing:border-box;min-height:44px;min-width:44px;padding:0 .85rem;margin:0;
+  font:inherit;font-size:.85rem;line-height:1;color:#dfe2f1;background:transparent;border:1px solid #8d94b3;border-radius:22px;cursor:pointer;
+  -webkit-appearance:none;appearance:none;white-space:nowrap}
+.da-theme[hidden]{display:none}
+.da-theme svg{flex:none;display:block}
+.da-theme:hover{border-color:#f3e6b4;color:#fff}
+.da-theme[aria-pressed="true"]{background:#f3e6b4;border-color:#f3e6b4;color:#151b38}
+:root{--dd-ink:#1b2342;--dd-ink2:#39426a;--dd-gold:#7a5200;--dd-line:#6b7390;--dd-card:rgba(255,255,255,.72)}
+:root:root[data-theme="day"]{--ink:#1b2342;--soft:#39426a;--mute:#4f5878;--muted:#4f5878;--quiet:#4f5878;--gold:#7a5200;--gold2:#7a5200;--gold-soft:#7a5200;--gold-line:rgba(122,82,0,.5);--card:rgba(255,255,255,.72);--line:rgba(122,82,0,.45)}   /* the pages' own colour variables */
+:root:root[data-theme="day"] body{background:linear-gradient(180deg,#fcf8ec 0,#f8f1de 55%,#f2e9d0 100%) fixed;background-color:#f8f1de;color:var(--dd-ink);text-shadow:none}
+:root:root[data-theme="day"] body :is(h1,h2,h3,h4,h5,p,li,ul,ol,div,span,small,em,strong,b,i,cite,time,dt,dd,td,th,label,summary,details,blockquote,figcaption,section,article,header,main,footer){color:var(--dd-ink);text-shadow:none}
+:root:root[data-theme="day"] body :is(.small,.meta,.fine,.sub,.lead,.crumbs,.t,.date,.sources li,.cinzel,figcaption,.da-site .c,.da-site .c span,.ep small,.ep span,.chapters .t,.note,.disc){color:var(--dd-ink2)}
+:root:root[data-theme="day"] body :is(.badge,.eyebrow,.kicker,.k,.n,.tag,.chip){color:var(--dd-gold)}
+:root:root[data-theme="day"] body .num{color:#151b38}
+:root:root[data-theme="day"] body a{color:var(--dd-gold)}
+:root:root[data-theme="day"] body a:hover{color:var(--dd-ink)}
+:root:root[data-theme="day"] body :is(.da-topnav a:not([aria-current]),.da-site a,.crumbs a){color:var(--dd-ink2)}
+:root:root[data-theme="day"] body .da-topnav a[aria-current]{color:var(--dd-ink);text-decoration-color:rgba(122,82,0,.6)}
+:root:root[data-theme="day"] body .da-topnav .wm{color:var(--dd-gold)}
+:root:root[data-theme="day"] body .da-site{border-top-color:rgba(27,35,66,.2)}
+:root:root[data-theme="day"] body .da-site .c a{color:var(--dd-gold)}
+/* pages that style the body and headings inline (the 404) need !important to follow the switch */
+:root:root[data-theme="day"] body[style]{background:#f8f1de!important;color:#1b2342!important}
+:root:root[data-theme="day"] body :is(h1,a)[style*="color"]{color:var(--dd-gold)!important}
+:root:root[data-theme="day"] body h1[style*="color"]{color:var(--dd-ink)!important}
+/* cards, panels, forms */
+:root:root[data-theme="day"] body :is(.card,.ep,.hcard,.comp,.prose,.signup,.quiz,.cta,.book,.note,details.narr,li.comp,main.card,.steps li,.tips li,.ai li){background:var(--dd-card);background-image:none;border-color:rgba(27,35,66,.2)}
+:root:root[data-theme="day"] body main :is(.card,.ep){background:var(--dd-card)}
+:root:root[data-theme="day"] body :is(.badge,.chip,.n,a.tl,a.getit,.back){border-color:rgba(122,82,0,.5)}
+:root:root[data-theme="day"] body :is(li,.chapters li,.book){border-color:rgba(27,35,66,.18)}
+:root:root[data-theme="day"] body input,:root:root[data-theme="day"] body select,:root:root[data-theme="day"] body textarea{background:#fff;color:var(--dd-ink);border:1px solid var(--dd-line)}
+:root:root[data-theme="day"] body input::placeholder{color:#575f80;opacity:1}
+/* buttons: gold fill with dark text stays; ghost buttons get a navy outline */
+:root:root[data-theme="day"] body :is(a.btn,button.btn,.btn,button:not(.da-theme):not(.yt)){color:#151b38}
+:root:root[data-theme="day"] body :is(a.btn,button.btn,.btn):hover{color:#151b38}
+:root:root[data-theme="day"] body :is(a.btn,button.btn,.btn):not(.ghost),:root:root[data-theme="day"] body .num{background-color:#e3c77a;box-shadow:inset 0 0 0 1px rgba(122,82,0,.55)}
+:root:root[data-theme="day"] body :is(a.btn.ghost,.btn.ghost){color:var(--dd-ink);background:transparent;border-color:var(--dd-line)}
+:root:root[data-theme="day"] body :is(.bar){background:rgba(27,35,66,.14)}
+:root:root[data-theme="day"] body .steps .n{background:transparent}
+/* video tiles are photographs on a dark ground: they keep their night look */
+:root:root[data-theme="day"] body .vid,:root:root[data-theme="day"] body .vid *{color:#f4eedc}
+:root:root[data-theme="day"] body .vid{border-color:rgba(27,35,66,.25)}
+/* sky: no stars; the moon becomes a faint sun */
+:root:root[data-theme="day"] body #sky{display:none}
+:root:root[data-theme="day"] body .sky{background-image:none}
+:root:root[data-theme="day"] body .moon{background:radial-gradient(circle at 42% 40%,#fff3c8 0,#f6d98a 60%,#efc566 100%)!important;box-shadow:none!important;filter:drop-shadow(0 0 10px rgba(239,197,102,.4))!important;opacity:.6!important;transform:none!important}
+/* focus ring: navy outside, white inside, so it shows on cream and on gold */
+:root:root[data-theme="day"] body :is(a,button,input,select,textarea,summary,[tabindex]:not([tabindex="-1"])):focus-visible{outline:3px solid #1b2342;outline-offset:3px;box-shadow:0 0 0 3px #fff}
+:root:root[data-theme="day"] body .da-theme{color:var(--dd-ink);border-color:var(--dd-line)}
+:root:root[data-theme="day"] body .da-theme:hover{border-color:var(--dd-ink);color:var(--dd-ink)}
+:root:root[data-theme="day"] body .da-theme[aria-pressed="true"]{background:#1b2342;border-color:#1b2342;color:#fcf8ec}
+/* the label inside the switch follows the button, not the generic span colour above */
+:root:root[data-theme="day"] body .da-theme span{color:inherit}
+@media (prefers-contrast:more){
+  :root:root[data-theme="day"] body{background:#fff;color:#000}
+  :root:root[data-theme="day"] body :is(p,li,div,span,small,h1,h2,h3,.small,.meta,.fine,.crumbs,.da-site a,.da-topnav a){color:#000}
+  :root:root[data-theme="day"] body a{color:#4a3000}
+  :root:root[data-theme="day"] body main :is(.card,.ep){background:#fff;border-color:#000}
+}
+@media (max-width:24rem){.da-theme{padding:0 .7rem}}
