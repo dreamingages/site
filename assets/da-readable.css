@@ -157,10 +157,6 @@ html{font-size:112.5%;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 .da-theme[hidden]{display:none}
 .da-theme svg{flex:none;display:block}
 .da-theme:hover{border-color:#f3e6b4;color:#fff}
-.da-theme .da-moon,.da-theme .da-n{display:none}
-:root:root[data-theme="day"] body .da-theme .da-sun,:root:root[data-theme="day"] body .da-theme .da-d{display:none}
-:root:root[data-theme="day"] body .da-theme .da-moon{display:block}
-:root:root[data-theme="day"] body .da-theme .da-n{display:inline}
 :root{--dd-ink:#1b2342;--dd-ink2:#39426a;--dd-gold:#7a5200;--dd-line:#6b7390;--dd-card:rgba(255,255,255,.72)}
 :root:root[data-theme="day"]{--ink:#1b2342;--soft:#39426a;--mute:#4f5878;--muted:#4f5878;--quiet:#4f5878;--gold:#7a5200;--gold2:#7a5200;--gold-soft:#7a5200;--gold-line:rgba(122,82,0,.5);--card:rgba(255,255,255,.72);--line:rgba(122,82,0,.45)}   /* the pages' own colour variables */
 :root:root[data-theme="day"] body{background:linear-gradient(180deg,#fcf8ec 0,#f8f1de 55%,#f2e9d0 100%) fixed;background-color:#f8f1de;color:var(--dd-ink);text-shadow:none}
@@ -206,6 +202,11 @@ html{font-size:112.5%;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 :root:root[data-theme="day"] body .da-theme:hover{border-color:var(--dd-ink);color:var(--dd-ink)}
 /* the label inside the switch follows the button, not the generic span colour above */
 :root:root[data-theme="day"] body .da-theme span{color:inherit}
+/* legacy: pages published at 5:19-5:27 PM ET on 25 Oct carried two icons + two labels in the button; this keeps those cached pages showing one of each. New pages have one icon and one label (set by the head script) and do not use these classes. */
+.da-theme .da-moon,.da-theme .da-n{display:none}
+:root:root[data-theme="day"] body .da-theme .da-sun,:root:root[data-theme="day"] body .da-theme .da-d{display:none}
+:root:root[data-theme="day"] body .da-theme .da-moon{display:block}
+:root:root[data-theme="day"] body .da-theme .da-n{display:inline}
 @media (prefers-contrast:more){
   :root:root[data-theme="day"] body{background:#fff;color:#000}
   :root:root[data-theme="day"] body :is(p,li,div,span,small,h1,h2,h3,.small,.meta,.fine,.crumbs,.da-site a,.da-topnav a){color:#000}
