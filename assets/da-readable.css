@@ -1,0 +1,122 @@
+/* Dreaming Ages: readability + accessibility layer (WCAG 2.2 AA, most AAA text rules).
+   Loaded AFTER each page's own inline <style>, so it wins on equal specificity (":root:root body" prefix adds a little more).
+   Night look and brand colours are unchanged; this only raises text size/contrast/spacing, limits line length,
+   keeps stars out of the text column, and adds a skip link, strong focus rings and reduced-motion/contrast support. */
+
+:root{
+  --da-ink:#f4f1e8;          /* body text, near-white warm   (~16:1 on the page navy) */
+  --da-ink-2:#dfe2f1;        /* secondary text               (~13:1) */
+  --da-gold:#f3e6b4;         /* links + headings accent      (~14:1) */
+  --da-gold-2:#ecdca0;       /* timestamps / badges          (~13:1) */
+  --da-col:23rem;            /* half the text column: stars are masked inside this */
+}
+
+/* 1. Size: 18px default, in rem so browser text-size and zoom still scale it */
+html{font-size:112.5%;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+:root:root body{font-size:1rem;color:var(--da-ink);line-height:1.7}
+:root:root body :is(p,li,dd,dt,td,th,figcaption,summary,label,blockquote){font-size:1rem;line-height:1.7;color:var(--da-ink)}
+:root:root body :is(ol,ul){line-height:1.7}
+:root:root body .lead{font-size:1.1875rem;color:#fff;line-height:1.65}
+:root:root body .sub{font-size:1.25rem;line-height:1.65;color:var(--da-ink)}
+
+/* secondary / small text: never below 16px, and still high contrast */
+:root:root body :is(.small,.meta,.fine,.yt-note,.disc,.consent,.crumbs,.eyebrow,.phase,.when,.chip,.open,.note,.ytm,.c,.sources li,small,footer,.da-site,.da-topnav,.brand,.badge,.num,.q-kicker,.getit,.tl,.ep small,.ep span){font-size:.9rem;line-height:1.6}
+/* muted grey-blue secondary text -> lighter; gold accents (.badge .brand .num .when .chip .q-kicker .open) keep their own colours */
+:root:root body :is(.small,.meta,.fine,.yt-note,.disc,.consent,.crumbs,.eyebrow,.note,.ytm,.c,.sources li,small,footer,.da-site){color:var(--da-ink-2)}
+:root:root body :is(.sources li){font-size:.95rem}
+:root:root body .da-topnav{font-size:.95rem}
+:root:root body .da-topnav .wm{font-size:.85rem}
+:root:root body .da-site{font-size:.95rem;line-height:1.8;color:var(--da-ink-2)}
+:root:root body .brand{font-size:.9rem}
+:root:root body .btn{font-size:1.0625rem;min-height:2.75rem;padding:.7rem 1.3rem;box-sizing:border-box}
+
+/* 2. Headings keep their look, with a little more air */
+:root:root body h1{line-height:1.2}
+:root:root body h2{line-height:1.3}
+:root:root body h3{line-height:1.35}
+
+/* 3. Line length: about 65-75 characters. Episode pages: the whole article column is centred at 31em (about 72 characters
+   of Georgia at 18px); video and header stay full width. Other pages: paragraphs capped, centred ones stay centred. */
+:root:root body :is(.prose,article){max-width:31em;margin-left:auto;margin-right:auto}
+:root:root body main :is(p,li):not(.badge){max-width:34em}
+:root:root body :is(.center,.sub,.hero,.cta,.intro) :is(p,.sub){margin-left:auto;margin-right:auto}
+:root:root body :is(.prose,article) :is(p,li,ol,ul){max-width:none}
+:root:root body main :is(.meta,.watch,.sub,.brand,p[style*="center"]){margin-left:auto;margin-right:auto}
+
+/* 4. Links: always underlined inside text, thicker, with a gold that passes on the navy */
+:root:root body a{text-decoration-thickness:.075em;text-underline-offset:.2em}
+:root:root body :is(p,li,small,.small,.fine,.c) a:not(.btn):not(.ep):not(.tl){text-decoration-line:underline}
+:root:root body a:hover{color:#fff}
+:root:root body .chapters .t,:root:root body .chapters .t{color:var(--da-gold-2)}
+:root:root body .chapters li{color:var(--da-ink)}
+:root:root body .chapters a{color:var(--da-ink);border-bottom-width:2px}
+:root:root body .da-topnav a,:root:root body .da-site a{display:inline-block;padding:.45rem .3rem;margin:0 .15rem}
+:root:root body .da-topnav a:not([aria-current]){color:var(--da-ink-2)}
+:root:root body .da-topnav a[aria-current]{color:#fff}
+:root:root body .da-topnav .wm{padding:.45rem 0;margin:0;color:#e6d9a8}
+:root:root body .crumbs a{color:var(--da-ink-2);text-decoration:underline}
+
+/* 5. Cards: more opaque so the text sits on a calm dark panel */
+:root:root body main :is(.card,.ep){background:rgba(10,14,30,.9)}
+
+/* 6. Stars stay in the margins. The sky canvas is masked inside the text column; on narrow screens the column is the whole screen, so stars are hidden. */
+:root:root body #sky{
+  -webkit-mask-image:linear-gradient(to right,#000 0,#000 calc(50% - var(--da-col) - 2rem),transparent calc(50% - var(--da-col)),transparent calc(50% + var(--da-col)),#000 calc(50% + var(--da-col) + 2rem),#000 100%);
+          mask-image:linear-gradient(to right,#000 0,#000 calc(50% - var(--da-col) - 2rem),transparent calc(50% - var(--da-col)),transparent calc(50% + var(--da-col)),#000 calc(50% + var(--da-col) + 2rem),#000 100%);
+  opacity:.85}
+@media (max-width:52rem){:root:root body #sky,:root:root body .moon{display:none}}
+
+/* 7. Focus: two-tone ring (white outside, dark inside) that shows on navy AND on the gold buttons */
+:root:root body :is(a,button,input,select,textarea,summary,[tabindex]:not([tabindex="-1"])):focus-visible{
+  outline:3px solid #fff;outline-offset:3px;box-shadow:0 0 0 3px #05070f;border-radius:3px}
+:root:root body :is(a,button,input,select,textarea,summary):focus:not(:focus-visible){outline:none}
+:root:root body input,:root:root body select,:root:root body textarea{font-size:1rem;min-height:2.75rem;color:#fff}
+:root:root body input::placeholder{color:#c9cde4;opacity:1}
+
+/* 8. Skip link */
+.da-skip{position:absolute;left:.75rem;top:-6rem;z-index:1000;padding:.8rem 1.1rem;background:#f4eedc;color:#0d1326;
+  font:1rem/1.3 Georgia,"Times New Roman",serif;border-radius:8px;text-decoration:underline;transition:none}
+.da-skip:focus{top:.75rem;outline:3px solid #fff;box-shadow:0 0 0 3px #05070f}
+[id="da-main"]:focus{outline:none}
+
+/* 9. Motion: no stars or animation for people who ask for less */
+@media (prefers-reduced-motion:reduce){
+  :root:root body #sky{display:none}
+  :root:root body *,:root:root body *::before,:root:root body *::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition:none!important;scroll-behavior:auto!important}
+}
+
+/* 10. High-contrast preference: pure white text, no stars, solid panels, firmer borders */
+@media (prefers-contrast:more){
+  :root:root body{color:#fff}
+  :root:root body :is(p,li,.small,.meta,.fine,.crumbs,.sources li,.da-site,.da-topnav a){color:#fff}
+  :root:root body #sky{display:none}
+  :root:root body main :is(.card,.ep){background:#0a0e1e;border-color:#cfd3ea}
+  :root:root body a{color:#fff3c4}
+}
+
+/* 11. Top nav must wrap rather than run off the edge on phones and at 200-400% zoom */
+:root:root body .da-topnav .l{flex-wrap:wrap;gap:0 .6rem}
+:root:root body .da-topnav{gap:0 .8rem}
+
+/* 12. Footnote numbers (superscript links in the sleep guide) were about 11px; make them readable and easier to hit */
+:root:root body sup{font-size:.8em}
+:root:root body sup a{opacity:1;padding:0 .25em;text-decoration:underline}
+:root:root body .ep span{font-size:1rem;color:var(--da-ink)}
+:root:root body .ep small{font-size:.9rem}
+
+/* 13. Touch targets (second patch, Ian 25 Oct 2026): links that stand on their own line are at least 44px tall.
+   Links inside a sentence stay inline (WCAG 2.5.8 exempts them) so paragraphs do not change. */
+:root:root body :is(.da-topnav,.da-site,footer,.crumbs,.links) a,
+:root:root body :is(li,p.small,p.links,.watch,.disc):has(> a:only-child) > a,
+:root:root body .chapters a,
+:root:root body :is(a.getit,a.tl,.back){display:inline-flex;align-items:center;min-height:44px;box-sizing:border-box;vertical-align:middle}
+:root:root body .chapters a{display:flex;border-bottom:0;padding:.25rem 0;text-decoration:underline;text-decoration-thickness:.075em;text-underline-offset:.2em}
+:root:root body .chapters li{border-bottom:1px solid rgba(217,201,143,.25)}
+:root:root body .da-topnav a,:root:root body .da-site a{padding:.2rem .5rem}
+
+/* 14. Kit signup: visible labels above each field (the placeholder alone disappears while typing) */
+.da-fl{display:block;text-align:left;margin:0 0 .35rem;font-size:1rem;line-height:1.4;color:var(--da-ink,#f4f1e8)}
+:root:root body form .da-fl + input{margin-bottom:1rem}
+
+/* 15. Pages whose content was wrapped in <main> by da_readable.py (the 404): keep the 34em column centred, as the page's own text-align:center intends */
+:root:root body main[data-da="wrap"]{max-width:34em;margin-left:auto;margin-right:auto}
