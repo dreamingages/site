@@ -129,7 +129,7 @@ main.home{max-width:640px;padding:144px var(--s3) var(--s6)}
 <section class="center" aria-labelledby="h-comp"><h2 id="h-comp">Free bedtime companions</h2>
 <p>Printable guides to the people and places behind each story. Keep one by the lamp, or skim it once and let the episode do the rest.</p>
 <p class="links"><a class="tl" href="/sleep/?ref=home">Get the free companions</a> <a class="tl" href="/companions/">Try a free sample</a></p>
-<p class="small">Every episode, companion and email is free, with no paywall or paid plan.</p></section>
+<p class="small">Every episode and companion is free.</p></section>
 <div class="rule" aria-hidden="true"><i></i></div>
 <div class="pair">
 <section><h2>A calmer night</h2><p>Ten small, evidence-based steps from morning to moonrise, with sources and where to find more help.</p><p><a class="tl" href="/sleep-guide/">Read the sleep guide →</a></p></section>
@@ -143,8 +143,8 @@ main.home{max-width:640px;padding:144px var(--s3) var(--s6)}
 <p class="small">Prefer a podcast app? Dreaming Ages History is also on <a href="https://open.spotify.com/show/1yXCmMATNP3JGeYehVtYCt">Spotify</a> and <a href="https://podcasts.apple.com/podcast/id6819722484">Apple Podcasts</a>.</p>
 <p class="small">Narration on the channel is AI-generated text-to-speech. Not medical advice: if poor sleep lasts or affects your days, please talk to a doctor. Questions: <a href="mailto:hello@dreamingages.com">hello@dreamingages.com</a></p>
 </section>
-<nav class="da-site" aria-label="Site"><a href="/">Home</a><a href="/episodes/">Episodes</a><a href="/sleep/">Free companions</a><a href="/companions/">Companion samples</a><a href="/sleep-guide/">Sleep guide</a><a href="/sleep-quiz/">Sleep quiz</a><a href="/our-approach/">Our approach</a><a href="/reading/">Reading lists</a><a href="https://www.youtube.com/@DreamingAgesHistory">YouTube</a><a href="/accessibility/">Accessibility</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><span class="c">Every episode, companion and email is free, with no paywall or paid plan · <a href="mailto:hello@dreamingages.com" style="margin:0">hello@dreamingages.com</a></span></nav>
-</main><script>const c=document.getElementById('sky'),x=c.getContext('2d');let s=[];
+<nav class="da-site" aria-label="Site"><div class="g"><a href="/">Home</a><a href="/episodes/">Episodes</a><a href="/sleep/">Free companions</a><a href="/companions/">Companion samples</a></div><div class="g"><a href="/sleep-guide/">Sleep guide</a><a href="/sleep-quiz/">Sleep quiz</a><a href="/our-approach/">Our approach</a><a href="/reading/">Reading lists</a></div><div class="g"><a href="https://www.youtube.com/@DreamingAgesHistory">YouTube</a><a href="/accessibility/">Accessibility</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a></div><span class="c">Every episode and companion is free.</span><span class="c"><a href="mailto:hello@dreamingages.com" style="margin:0">hello@dreamingages.com</a></span></nav>
+</main><script>const c=document.getElementById('sky'),x=c.getContext('2d');let s=[];const RM=matchMedia('(prefers-reduced-motion:reduce)').matches;
 function init(){c.width=innerWidth;c.height=innerHeight;s=[];for(let i=0;i<Math.floor(c.width*c.height/3500);i++)s.push({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*1.3+.2,p:Math.random()*6.28,v:.003+Math.random()*.008})}
-function draw(){x.clearRect(0,0,c.width,c.height);for(const t of s){t.p+=t.v;x.globalAlpha=.35+.65*Math.abs(Math.sin(t.p));x.fillStyle='#fff';x.beginPath();x.arc(t.x,t.y,t.r,0,6.28);x.fill()}requestAnimationFrame(draw)}
-addEventListener('resize',init);init();draw();</script></body></html>
+function draw(){x.clearRect(0,0,c.width,c.height);for(const t of s){t.p+=t.v;x.globalAlpha=.35+.65*Math.abs(Math.sin(t.p));x.fillStyle='#fff';x.beginPath();x.arc(t.x,t.y,t.r,0,6.28);x.fill()}RM||requestAnimationFrame(draw)}
+let W=innerWidth;addEventListener('resize',()=>{if(innerWidth!==W){W=innerWidth;init();if(RM)draw()}});init();draw();</script></body></html>

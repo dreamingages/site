@@ -151,7 +151,7 @@
     h+='</ol>';
     var mt=mailto(best,t.flag); cur={best:best,flag:t.flag};
     h+='<div class="keep"><div class="keep-row"><a class="btn ghost sm" href="'+esc(mt.url)+'" data-mail>\u2709\uFE0F Email my results to myself</a><button class="btn ghost sm" type="button" data-copy>\uD83D\uDCCB Copy my results</button></div><p class="keep-note" role="status" aria-live="polite">Opens your own email app, with the To line left blank. Nothing is sent to us.</p></div>';
-    h+='<div class="offer joined" id="offer"><div class="ok">\u2714 You\u2019re on the list</div><h3>'+esc(OF[best])+'</h3><p>Your free Bedtime Companion library is on its way. Look for an email from hello@dreamingages.com in a minute or two (it may land in Promotions).</p><p class="fine">Every episode, companion and email is free, with no paywall or paid plan. Unsubscribe anytime with one click.</p></div>';
+    h+='<div class="offer joined" id="offer"><div class="ok">\u2714 You\u2019re on the list</div><h3>'+esc(OF[best])+'</h3><p>Your free Bedtime Companion library is on its way. Look for an email from hello@dreamingages.com in a minute or two (it may land in Promotions).</p><p class="fine">Every episode and companion is free. Unsubscribe anytime with one click.</p></div>';
     h+='<div class="sub-h">Stories for tonight</div><div class="eps">';
     p.eps.forEach(function(e){h+='<a class="ep" href="'+YT(e[0])+'" target="_blank" rel="noopener"><span class="play"><svg viewBox="0 0 16 16"><path d="M3 1.5v13l11-6.5z"/></svg></span><span><b>'+esc(e[1])+'</b><small>'+esc(e[2])+'</small></span></a>';});
     h+='</div>';

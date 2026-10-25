@@ -64,7 +64,15 @@ html{font-size:112.5%;-webkit-text-size-adjust:100%;text-size-adjust:100%}
   -webkit-mask-image:linear-gradient(to right,#000 0,#000 calc(50% - var(--da-col) - 2rem),transparent calc(50% - var(--da-col)),transparent calc(50% + var(--da-col)),#000 calc(50% + var(--da-col) + 2rem),#000 100%);
           mask-image:linear-gradient(to right,#000 0,#000 calc(50% - var(--da-col) - 2rem),transparent calc(50% - var(--da-col)),transparent calc(50% + var(--da-col)),#000 calc(50% + var(--da-col) + 2rem),#000 100%);
   opacity:.85}
-@media (max-width:52rem){:root:root body #sky,:root:root body .moon{display:none}}
+/* 6b. Phones and narrow windows (preview 26 Oct 2026): the column is the whole screen, so instead of hiding the night sky it is kept
+   to the top of the screen: stars fade out by 60% of the height, fainter than on desktop (35% opacity keeps body text above 4.5:1 even
+   directly behind a star), and a smaller crescent moon sits in the top-right corner just under the nav row, scrolls away with the page and stays behind the text. */
+@media (max-width:52rem){
+  :root:root body #sky{opacity:.35;
+    -webkit-mask-image:linear-gradient(to bottom,#000 0,#000 25%,transparent 60%);mask-image:linear-gradient(to bottom,#000 0,#000 25%,transparent 60%)}
+  :root:root body:has(#sky) .moon{position:absolute;top:5.4rem;right:.9rem;left:auto;width:28px;height:28px;
+    box-shadow:inset -5px 4px 0 0 #f1e6c0;filter:drop-shadow(0 0 5px rgba(255,246,210,.3));opacity:.85;pointer-events:none}
+}
 
 /* 7. Focus: two-tone ring (white outside, dark inside) that shows on navy AND on the gold buttons */
 :root:root body :is(a,button,input,select,textarea,summary,[tabindex]:not([tabindex="-1"])):focus-visible{
@@ -81,7 +89,8 @@ html{font-size:112.5%;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 
 /* 9. Motion: no stars or animation for people who ask for less */
 @media (prefers-reduced-motion:reduce){
-  :root:root body #sky{display:none}
+  /* stars are drawn once and do not twinkle (see da_readable._patch_sky_js); the page's own rule that hid them is overridden here */
+  :root:root body #sky{display:block}
   :root:root body *,:root:root body *::before,:root:root body *::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition:none!important;scroll-behavior:auto!important}
 }
 
@@ -120,3 +129,20 @@ html{font-size:112.5%;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 
 /* 15. Pages whose content was wrapped in <main> by da_readable.py (the 404): keep the 34em column centred, as the page's own text-align:center intends */
 :root:root body main[data-da="wrap"]{max-width:34em;margin-left:auto;margin-right:auto}
+
+/* 16. Footer (preview 26 Oct 2026): three evenly spaced, centred link groups, then one short line and the contact address on their own lines.
+   Phones: each group is a 2-column grid so every link has the same width and a 44px target. Desktop: each group is one centred row. */
+:root:root body .da-site{display:flex;flex-direction:column;align-items:center;gap:0;max-width:40rem;margin:2.5rem auto 1.25rem;padding:1.1rem .75rem 0;text-align:center}
+:root:root body .da-site .g{display:flex;flex-wrap:wrap;justify-content:center;gap:0 .6rem;width:100%}
+:root:root body .da-site .g a{margin:0;padding:.2rem .6rem}
+:root:root body .da-site .c{display:block;flex-basis:auto;width:100%;margin:.45rem 0 0;text-align:center}
+:root:root body .da-site .c + .c{margin-top:0}
+:root:root body .da-site .c a{margin:0}
+@media (max-width:40rem){
+  :root:root body .da-site .g{display:grid;grid-template-columns:1fr 1fr;gap:0;max-width:21rem}
+  :root:root body .da-site .g a{justify-content:center;text-align:center;white-space:normal;padding:.2rem .4rem}
+}
+@media (max-width:24rem){:root:root body .da-site{padding-left:0;padding-right:0}:root:root body .da-site .g{max-width:none}:root:root body .da-site .g a{padding:.2rem 0;font-size:.9rem}}
+
+/* 17. Long unbroken text (source URLs on the episode pages) wraps instead of pushing the page wider than a phone screen (all-hallows was 409px wide at 400px) */
+:root:root body :is(main,article) :is(p,li,dd,figcaption,a){overflow-wrap:break-word}
