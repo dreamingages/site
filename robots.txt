@@ -2,3 +2,5 @@ User-agent: *
 Disallow: /p/
 
 Sitemap: https://dreamingages.com/sitemap.xml
+
+# Plain-text summary for AI assistants: https://dreamingages.com/llms.txt
